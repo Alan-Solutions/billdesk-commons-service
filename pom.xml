@@ -21,6 +21,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <postgresql.version>42.7.3</postgresql.version>
         <junit.jupiter.version>5.9.1</junit.jupiter.version>
+        <alan.user.version>1.0-SNAPSHOT</alan.user.version>
     </properties>
 
     <dependencies>
@@ -59,6 +60,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alan.user</groupId>
+            <artifactId>users-common-service</artifactId>
+            <version>${alan.user.version}</version>
         </dependency>
 
     </dependencies>

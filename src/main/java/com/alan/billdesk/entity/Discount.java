@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 public class Discount {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "discount_description")

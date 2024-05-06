@@ -7,4 +7,6 @@ public interface CategoryRepository extends CrudRepository<Category, Integer> {
 
   Category findByName(String name);
 
+  Category findFirstByOrderByIdAsc();
+
 }

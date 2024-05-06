@@ -11,7 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan({"com.alan.user", "com.alan.billdesk"})
 @EntityScan({"com.alan.user.entity","com.alan.billdesk.entity"})
 public class App {
-
   public static void main(String[] args) {
     SpringApplication.run(App.class);
   }

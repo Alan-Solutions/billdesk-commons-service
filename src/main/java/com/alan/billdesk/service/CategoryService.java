@@ -16,12 +16,8 @@ public class CategoryService {
   @Autowired
   private CategoryRepository categoryRepository;
 
-  public Category findFirstByOrderByIdAsc() {
-    return categoryRepository.findFirstByOrderByIdAsc();
-  }
-
-  public List<Category> findAll() {
-    return (List<Category>) categoryRepository.findAll();
+  public List<Category> findAllByOrderByIdAsc() {
+    return categoryRepository.findAllByOrderByIdAsc();
   }
 
   public Category save(Category category) {

@@ -6,8 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -21,21 +20,22 @@ public class ItemDetails {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+
   @Column(name = "item_price")
   private float price;
 
   @Column(name = "item_tax")
   private float tax;
 
-  @OneToOne
+  @ManyToOne
   @JoinColumn(name = "item_id")
   private Item item;
 
-  @OneToMany
+  @ManyToOne
   @JoinColumn(name = "unit_id")
   private Unit unit;
 
-  @OneToMany
+  @ManyToOne
   @JoinColumn(name = "discount_id")
   private Discount discount;
 

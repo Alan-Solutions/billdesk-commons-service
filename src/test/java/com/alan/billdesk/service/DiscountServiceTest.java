@@ -2,6 +2,7 @@ package com.alan.billdesk.service;
 
 
 import com.alan.billdesk.entity.Discount;
+import com.alan.billdesk.response.BillDeskResponse;
 import com.alan.billdesk.utils.CommonUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -14,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -30,7 +32,8 @@ public class DiscountServiceTest {
 
   @BeforeEach
   public void setUp() {
-    List<Discount> discounts = discountService.findAllByOrderByIdAsc();
+    BillDeskResponse<List<Discount>> response = discountService.findAllByOrderByIdAsc();
+    List<Discount> discounts = response.getBody();
     if (!commonUtils.isNullOrEmpty(discounts)) {
       defaultDiscount = discounts.get(0);
     }
@@ -43,15 +46,29 @@ public class DiscountServiceTest {
     Discount discount = new Discount();
     discount.setDiscount(0d);
     discount.setDiscountName("No Discount");
-    Discount savedDiscount = discountService.save(discount);
+    Discount savedDiscount = discountService.saveDiscount(discount).getBody();
     assertTrue(discount.getDiscountName().equals(savedDiscount.getDiscountName()));
-    savedDiscount = discountService.findById(savedDiscount.getId());
+    savedDiscount = discountService.findDiscountById(savedDiscount.getId()).getBody();
 
-    /** Testing Default values are working or not, @DynamicInsert is used in this class **/
+    /** Testing DB Default values are working or not, @DynamicInsert is used in this class **/
     assertTrue("relative".equalsIgnoreCase(savedDiscount.getDiscountType()));
     assertTrue("active".equalsIgnoreCase(savedDiscount.getStatus()));
     String dateTime = sdf.format(savedDiscount.getDiscountExpiry());
     assertTrue("1970-01-01 00:00:00".equals(dateTime));
+  }
+
+  @Test
+  @Order(2)
+  public void findByDiscountName() {
+    List<Discount> discounts = discountService.findByDiscountName("No Discount").getBody();
+    assertTrue(discounts.size() > 0);
+    assertEquals("No Discount".toUpperCase(), discounts.get(0).getDiscountName());
+  }
+
+  @Test
+  @Order(3)
+  public void updateDiscountTest() {
+
   }
 
 }

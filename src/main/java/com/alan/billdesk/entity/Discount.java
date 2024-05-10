@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import org.hibernate.annotations.DynamicInsert;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "discount")
@@ -33,7 +33,7 @@ public class Discount {
     private String discountType;
 
     @Column(name = "discount_expiry")
-    private Date discountExpiry;
+    private LocalDateTime discountExpiry;
 
     @Column(name = "status")
     private String status;

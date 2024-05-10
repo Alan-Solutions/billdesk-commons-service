@@ -1,6 +1,7 @@
 package com.alan.billdesk.service;
 
 import com.alan.billdesk.constants.Constants;
+import com.alan.billdesk.constants.DataStatusEnum;
 import com.alan.billdesk.constants.ErrorConstants;
 import com.alan.billdesk.constants.StatusCode;
 import com.alan.billdesk.entity.Discount;
@@ -27,14 +28,14 @@ public class DiscountService {
   @Autowired
   private CommonUtils commonUtils;
 
-  public BillDeskResponse findAllByOrderByIdAsc() {
+  public BillDeskResponse<List<Discount>> findAllByOrderByIdAsc() {
     List<Discount> discounts = null;
     try {
       discounts = discountRepository.findAllByOrderByIdAsc();
       if (null != discounts) {
         return new BillDeskResponse<>(Constants.SUCCESS, discounts, commonUtils.emptyJson());
       } else {
-        return new BillDeskResponse<>(Constants.FALSE, discounts, dataNotAvailableJson());
+        return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
       }
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.findAllByOrderByIdAsc() ", dae);
@@ -49,9 +50,9 @@ public class DiscountService {
     try {
       Optional<Discount> discountOptional = findById(id);
       if (discountOptional.isPresent()) {
-        return new BillDeskResponse<Discount>(Constants.SUCCESS, discountOptional.get(), commonUtils.emptyJson());
+        return new BillDeskResponse<>(Constants.SUCCESS, discountOptional.get(), commonUtils.emptyJson());
       }
-      return new BillDeskResponse<Discount>(Constants.SUCCESS, discountOptional.get(), commonUtils.emptyJson());
+      return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.findById() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -68,7 +69,7 @@ public class DiscountService {
       if (!commonUtils.isNullOrEmpty(discounts)) {
         return new BillDeskResponse<>(Constants.SUCCESS, discounts, commonUtils.emptyJson());
       }
-      return new BillDeskResponse<>(Constants.FALSE, discounts, dataNotAvailableJson());
+      return new BillDeskResponse<>(Constants.FAILED, discounts, dataNotAvailableJson());
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.findByDiscountName() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -92,7 +93,7 @@ public class DiscountService {
     }
   }
 
-  public BillDeskResponse update(Discount existingDiscount) {
+  public BillDeskResponse<Discount> update(Discount existingDiscount) {
     try {
       logger.debug("Discount from user :: {}", existingDiscount);
       Optional<Discount> optionalDiscount = findById(existingDiscount.getId());
@@ -111,7 +112,7 @@ public class DiscountService {
       logger.error("Error while making call to DiscountService.update() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
-    return new BillDeskResponse<>(Constants.FALSE, null, dataNotAvailableJson());
+    return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
   }
 
   public void deleteById(int id) {
@@ -148,33 +149,25 @@ public class DiscountService {
 
 
   private void update(Discount existingDiscount, Discount discountEntity) {
-    if (!commonUtils.isNullOrEmpty(existingDiscount.getDiscountName())
-      && !commonUtils.equals(discountEntity.getDiscountName(), existingDiscount.getDiscountName())) {
-      discountEntity.setDiscountName(existingDiscount.getDiscountName());
+    if (!commonUtils.equals(existingDiscount.getDiscountName(), discountEntity.getDiscountName())) {
+      discountEntity.setDiscountName(existingDiscount.getDiscountName().toUpperCase());
     }
-    if (null != existingDiscount.getDiscount() && existingDiscount.getDiscount() != discountEntity.getDiscount()) {
+    if (!commonUtils.equals(existingDiscount.getDiscount(), discountEntity.getDiscount()) ) {
       discountEntity.setDiscount(existingDiscount.getDiscount());
     }
-    if (!commonUtils.isNullOrEmpty(existingDiscount.getDiscountType())
-      && !commonUtils.equals(existingDiscount.getDiscountType(), discountEntity.getDiscountType())) {
+    if (!commonUtils.equals(existingDiscount.getDiscountType(), discountEntity.getDiscountType())) {
       discountEntity.setDiscountType(existingDiscount.getDiscountType());
     }
-    if (null != existingDiscount.getDiscountExpiry()
-      && !existingDiscount.getDiscountExpiry().equals(discountEntity.getDiscountExpiry())) {
+    if (!commonUtils.equals(existingDiscount.getDiscountExpiry(), discountEntity.getDiscountExpiry())) {
       discountEntity.setDiscountExpiry(existingDiscount.getDiscountExpiry());
     }
-    if (!commonUtils.equals(existingDiscount.getStatus(), discountEntity.getStatus())
-      && !commonUtils.equals(existingDiscount.getStatus(), discountEntity.getStatus())) {
+    if (!commonUtils.equals(existingDiscount.getStatus(), discountEntity.getStatus())) {
       discountEntity.setStatus(existingDiscount.getStatus());
-    }
-    if (!commonUtils.equals(existingDiscount.getDiscountType(), discountEntity.getDiscountType())
-      && !commonUtils.equals(existingDiscount.getDiscountType(), discountEntity.getDiscountType())) {
-      discountEntity.setDiscountType(existingDiscount.getDiscountType());
     }
   }
 
   private JSONObject dataNotAvailableJson() {
-    return commonUtils.createErrorJson(StatusCode.NOT_FOUND.value(), Constants.DATA_NOT_AVAILABLE, Constants.FALSE);
+    return commonUtils.createErrorJson(DataStatusEnum.DATA_NOT_AVAILABLE.getCode(), DataStatusEnum.DATA_NOT_AVAILABLE.getMessage(), Constants.FALSE);
   }
 
 }

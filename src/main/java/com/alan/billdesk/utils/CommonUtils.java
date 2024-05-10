@@ -3,6 +3,7 @@ package com.alan.billdesk.utils;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -23,12 +24,26 @@ public class CommonUtils {
   }
 
   public boolean equals(String s1, String s2) {
+    if(null == s1 || null == s2)
+      return true;
     return s1.equals(s2);
+  }
+
+  public boolean equals(Double d1, Double d2) {
+    if(null == d1 || null == d2)
+      return true;
+    return d1 == d2;
+  }
+
+  public boolean equals(LocalDateTime d1, LocalDateTime d2) {
+    if(null == d1 || null == d2)
+      return true;
+    return d1.isEqual(d2);
   }
 
   public JSONObject createErrorJson(String... keyValue) {
     JSONObject jsonObject = new JSONObject();
-    String []kv;
+    String[] kv;
     for (String str : keyValue) {
       kv = str.split(":");
       jsonObject.put(kv[0], kv[1]);

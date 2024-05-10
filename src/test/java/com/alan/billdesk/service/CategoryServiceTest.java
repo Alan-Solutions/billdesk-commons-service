@@ -29,7 +29,7 @@ public class CategoryServiceTest {
 
     @BeforeEach
     public void setUp() {
-        List<Category> categories = categoryService.findAllByOrderByIdAsc();
+        List<Category> categories = categoryService.findAllByOrderByIdAsc().getBody();
         if(!commonUtils.isNullOrEmpty(categories)) {
             defaultCategory = categories.get(0);
         }
@@ -40,21 +40,21 @@ public class CategoryServiceTest {
     public void saveTest() {
         Category category = new Category();
         category.setName("Recharge");
-        Category savedCategory = categoryService.save(category);
+        Category savedCategory = categoryService.saveCategory(category).getBody();
         assertEquals(category.getName(), savedCategory.getName());
     }
 
     @Test
     @Order(2)
     public void findByIdTest() {
-        Category category = categoryService.findById(defaultCategory.getId());
+        Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
         assertTrue(null != category);
     }
 
     @Test
     @Order(3)
     public void findByNameTest() {
-        Category category = categoryService.findByName("Recharge");
+        Category category = categoryService.findByName("Recharge").getBody();
         assertTrue(category != null);
     }
 
@@ -65,7 +65,7 @@ public class CategoryServiceTest {
         Category category = new Category();
         category.setId(defaultCategory.getId());
         category.setName("New Recharge");
-        Category updatedCategory = categoryService.update(category);
+        Category updatedCategory = categoryService.update(category).getBody();
         assertTrue(updatedCategory.getName().equals(category.getName()));
     }
 
@@ -73,7 +73,7 @@ public class CategoryServiceTest {
     @Order(5)
     public void deleteByIdTest() {
         categoryService.delete(defaultCategory.getId());
-        Category category = categoryService.findById(defaultCategory.getId());
+        Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
         assertTrue(null == category);
     }
 

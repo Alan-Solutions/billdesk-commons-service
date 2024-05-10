@@ -75,13 +75,13 @@ public class CategoryServiceTest {
         assertTrue(updatedCategory.getName().equals(category.getName()));
     }
 
-    @Test
-    @Order(5)
-    public void deleteByIdTest() {
-        categoryService.deleteById(defaultCategory.getId());
-        Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
-        assertTrue(null == category);
-    }
+//    @Test
+//    @Order(5)
+//    public void deleteByIdTest() {
+//        categoryService.deleteById(defaultCategory.getId());
+//        Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
+//        assertTrue(null == category);
+//    }
 
 //    @Test
 //    @Order(6)

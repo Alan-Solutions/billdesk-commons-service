@@ -29,14 +29,9 @@ public class CategoryService {
   private CategoryRepository categoryRepository;
 
   public BillDeskResponse<List<Category>> findAllByOrderByIdAsc() {
-    List<Category> categories = null;
     try {
-      categories = categoryRepository.findAllByOrderByIdAsc();
-      if (null != categories) {
-        return new BillDeskResponse<>(Constants.SUCCESS, categories, commonUtils.emptyJson());
-      } else {
-        return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
-      }
+      List<Category> categories = categoryRepository.findAllByOrderByIdAsc();
+      return commonUtils.createResponse(categories, dataNotAvailableJson());
     } catch (DataAccessException dae) {
       logger.error("Error while making call to CategoryService.findAllByOrderByIdAsc() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -60,30 +55,32 @@ public class CategoryService {
   }
 
   public BillDeskResponse<Category> update(Category category) {
-    Optional<Category> oCategory = findById(category.getId());
-    if (oCategory.isPresent()) {
-      Category updateCategory = oCategory.get();
-      updateCategory.setName(category.getName());
-      saveCategory(updateCategory);
-      return new BillDeskResponse<>(Constants.SUCCESS, category, commonUtils.emptyJson());
+    try {
+      Optional<Category> oCategory = findById(category.getId());
+      if (oCategory.isPresent()) {
+        Category updateCategory = oCategory.get();
+        updateCategory.setName(category.getName());
+        category = save(updateCategory);
+      }
+    } catch (DataAccessException dae) {
+      logger.error("Error while making call to CategoryService.saveCategory() ", dae);
+      throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+    } catch (Exception e) {
+      logger.error("Error while making call to CategoryService.saveCategory() :: Exception", e);
+      throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
-    return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
+    return commonUtils.createResponse(category, dataNotAvailableJson());
   }
 
   public BillDeskResponse<Category> findByName(String name) {
     Category category = categoryRepository.findByName(name);
-    if (null != category)
-      return new BillDeskResponse<>(Constants.SUCCESS, category, commonUtils.emptyJson());
-    return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
+    return commonUtils.createResponse(category, dataNotAvailableJson());
   }
 
   public BillDeskResponse<Category> findCategoryById(int id) {
     Optional<Category> oCategory = null;
     try {
       oCategory = findById(id);
-      if (oCategory.isPresent()) {
-        return new BillDeskResponse<>(Constants.SUCCESS, oCategory.get(), commonUtils.emptyJson());
-      }
     } catch (DataAccessException dae) {
       logger.error("Error while making call to CategoryService.findCategoryById() {}", id, dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -91,19 +88,31 @@ public class CategoryService {
       logger.error("Error while making call to CategoryService.findCategoryById() {} :: Exception", id, e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
-    return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
+    return commonUtils.createResponse(oCategory, dataNotAvailableJson());
   }
 
-  public void delete(int id) {
-    categoryRepository.deleteById(id);
-  }
-
-  public void delete(Category category) {
-    categoryRepository.delete(category);
+  public void deleteById(int id) {
+    try {
+      categoryRepository.deleteById(id);
+    } catch (DataAccessException dae) {
+      logger.error("Error while making call to CategoryService.deleteById() {}", id, dae);
+      throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+    } catch (Exception e) {
+      logger.error("Error while making call to CategoryService.deleteById() {} :: Exception", id, e);
+      throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
+    }
   }
 
   public void deleteAll() {
-    categoryRepository.deleteAll();
+    try {
+      categoryRepository.deleteAll();
+    } catch (DataAccessException dae) {
+      logger.error("Error while making call to CategoryService.deleteAll() ", dae);
+      throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+    } catch (Exception e) {
+      logger.error("Error while making call to CategoryService.deleteAll():: Exception", e);
+      throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
+    }
   }
 
   private Optional<Category> findById(int id) {

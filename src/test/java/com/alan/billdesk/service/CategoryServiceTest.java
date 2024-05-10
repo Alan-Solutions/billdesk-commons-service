@@ -1,6 +1,8 @@
 package com.alan.billdesk.service;
 
+import com.alan.billdesk.constants.Constants;
 import com.alan.billdesk.entity.Category;
+import com.alan.billdesk.response.BillDeskResponse;
 import com.alan.billdesk.utils.CommonUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -49,6 +51,10 @@ public class CategoryServiceTest {
     public void findByIdTest() {
         Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
         assertTrue(null != category);
+        List<Category> categories = categoryService.findAllByOrderByIdAsc().getBody();
+        category = categories.get(categories.size() - 1);
+        BillDeskResponse resp = categoryService.findCategoryById(category.getId() + 100);
+        assertTrue(resp.getStatus().equals(Constants.FAILED));
     }
 
     @Test
@@ -72,7 +78,7 @@ public class CategoryServiceTest {
     @Test
     @Order(5)
     public void deleteByIdTest() {
-        categoryService.delete(defaultCategory.getId());
+        categoryService.deleteById(defaultCategory.getId());
         Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
         assertTrue(null == category);
     }

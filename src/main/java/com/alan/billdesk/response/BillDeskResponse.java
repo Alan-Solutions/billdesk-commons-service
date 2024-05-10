@@ -17,14 +17,14 @@ import org.json.simple.JSONObject;
 @Data
 public class BillDeskResponse<T> {
 
-  private String success;
+  private String status;
 
   private T body;
 
   private JSONObject errorDetails;
 
-  public BillDeskResponse(String success, T body, JSONObject errorDetails) {
-    this.success = success;
+  public BillDeskResponse(String status, T body, JSONObject errorDetails) {
+    this.status = status;
     this.body = body;
     this.errorDetails = errorDetails;
   }

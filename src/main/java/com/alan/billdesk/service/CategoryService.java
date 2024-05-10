@@ -61,7 +61,7 @@ public class CategoryService {
 
   public BillDeskResponse<Category> update(Category category) {
     Optional<Category> oCategory = findById(category.getId());
-    if(oCategory.isPresent()) {
+    if (oCategory.isPresent()) {
       Category updateCategory = oCategory.get();
       updateCategory.setName(category.getName());
       saveCategory(updateCategory);
@@ -79,7 +79,7 @@ public class CategoryService {
 
   public BillDeskResponse<Category> findCategoryById(int id) {
     Optional<Category> oCategory = null;
-    try{
+    try {
       oCategory = findById(id);
       if (oCategory.isPresent()) {
         return new BillDeskResponse<>(Constants.SUCCESS, oCategory.get(), commonUtils.emptyJson());
@@ -88,7 +88,7 @@ public class CategoryService {
       logger.error("Error while making call to CategoryService.findCategoryById() {}", id, dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to CategoryService.findCategoryById() {} :: Exception",id, e);
+      logger.error("Error while making call to CategoryService.findCategoryById() {} :: Exception", id, e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
     return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());

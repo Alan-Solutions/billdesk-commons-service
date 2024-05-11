@@ -2,8 +2,6 @@
 
 CREATE SCHEMA public AUTHORIZATION atc;
 
-COMMENT ON SCHEMA public IS 'standard public schema';
-
 -- DROP SEQUENCE public.category_seq;
 
 CREATE SEQUENCE public.category_seq
@@ -16,6 +14,15 @@ CREATE SEQUENCE public.category_seq
 -- DROP SEQUENCE public.discount_seq;
 
 CREATE SEQUENCE public.discount_seq
+	INCREMENT BY 1
+	MINVALUE 1
+	MAXVALUE 9223372036854775807
+	START 1
+	CACHE 1
+	NO CYCLE;
+-- DROP SEQUENCE public.product_seq;
+
+CREATE SEQUENCE public.product_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
@@ -43,12 +50,13 @@ CREATE SEQUENCE public.users_id_seq
 
 -- Drop table
 
--- DROP TABLE public.category;
+-- DROP TABLE category;
 
-CREATE TABLE public.category (
+CREATE TABLE category (
 	id int4 NOT NULL,
 	"name" varchar NULL,
 	CONSTRAINT category_pkey PRIMARY KEY (id),
+	CONSTRAINT cgy_name_unq UNIQUE (name),
 	CONSTRAINT name_unq UNIQUE (name)
 );
 
@@ -57,9 +65,9 @@ CREATE TABLE public.category (
 
 -- Drop table
 
--- DROP TABLE public.customer;
+-- DROP TABLE customer;
 
-CREATE TABLE public.customer (
+CREATE TABLE customer (
 	id int4 NOT NULL,
 	"name" varchar NULL,
 	phone _varchar NULL,
@@ -75,17 +83,16 @@ CREATE INDEX cust_phone_idx ON public.customer USING gin (phone);
 
 -- Drop table
 
--- DROP TABLE public.discount;
+-- DROP TABLE discount;
 
-CREATE TABLE public.discount (
+CREATE TABLE discount (
 	id int4 NOT NULL,
 	discount_name varchar NULL,
 	discount numeric NULL,
-	discount_type varchar NULL,
+	discount_type varchar NOT NULL DEFAULT 'relative'::character varying,
 	discount_expiry timestamp NOT NULL DEFAULT to_timestamp('1970-01-01 00:00:00'::text, 'yyyy-MM-dd hh24:mi:ss'::text),
 	status varchar NOT NULL DEFAULT 'active'::character varying,
-	CONSTRAINT dis_name_unq null,
-	CONSTRAINT discount_pkey null
+	CONSTRAINT discount_pkey PRIMARY KEY (id)
 );
 
 
@@ -93,9 +100,9 @@ CREATE TABLE public.discount (
 
 -- Drop table
 
--- DROP TABLE public.props;
+-- DROP TABLE props;
 
-CREATE TABLE public.props (
+CREATE TABLE props (
 	"key" varchar NULL,
 	value varchar NULL
 );
@@ -105,9 +112,9 @@ CREATE TABLE public.props (
 
 -- Drop table
 
--- DROP TABLE public.unit;
+-- DROP TABLE unit;
 
-CREATE TABLE public.unit (
+CREATE TABLE unit (
 	id int4 NOT NULL,
 	unit_description varchar NULL,
 	unit_size numeric NULL,
@@ -119,9 +126,9 @@ CREATE TABLE public.unit (
 
 -- Drop table
 
--- DROP TABLE public.users;
+-- DROP TABLE users;
 
-CREATE TABLE public.users (
+CREATE TABLE users (
 	created_ts timestamp(6) NOT NULL,
 	id bigserial NOT NULL,
 	first_name varchar(255) NOT NULL,
@@ -138,56 +145,57 @@ CREATE TABLE public.users (
 
 -- Drop table
 
--- DROP TABLE public.invoice;
+-- DROP TABLE invoice;
 
-CREATE TABLE public.invoice (
+CREATE TABLE invoice (
 	id int4 NOT NULL,
 	"type" varchar NULL DEFAULT 'invoice'::character varying,
 	create_ts timestamp NOT NULL DEFAULT now(),
 	customer_id int4 NULL,
 	user_id int4 NOT NULL,
 	CONSTRAINT invoice_pkey PRIMARY KEY (id),
-	CONSTRAINT invoice_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES public.customer(id),
-	CONSTRAINT invoice_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(id)
+	CONSTRAINT invoice_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customer(id),
+	CONSTRAINT invoice_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 
--- public.item definition
+-- public.product definition
 
 -- Drop table
 
--- DROP TABLE public.item;
+-- DROP TABLE product;
 
-CREATE TABLE public.item (
+CREATE TABLE product (
 	id int4 NOT NULL,
-	item_name varchar NULL,
-	item_invoice_name varchar NULL,
+	"name" varchar NULL,
+	product_invoice_name varchar NULL,
 	category_id int4 NULL,
 	create_ts timestamp NOT NULL DEFAULT now(),
-	CONSTRAINT item_pkey PRIMARY KEY (id),
-	CONSTRAINT item_category_id_fkey FOREIGN KEY (category_id) REFERENCES public.category(id)
+	CONSTRAINT product_name_ctg_idunq UNIQUE (name, category_id),
+	CONSTRAINT product_pkey PRIMARY KEY (id),
+	CONSTRAINT product_category_id_fkey FOREIGN KEY (category_id) REFERENCES category(id)
 );
 
 
--- public.item_details definition
+-- public.product_details definition
 
 -- Drop table
 
--- DROP TABLE public.item_details;
+-- DROP TABLE product_details;
 
-CREATE TABLE public.item_details (
+CREATE TABLE product_details (
 	id int4 NOT NULL,
-	item_price numeric NULL,
-	item_tax numeric NULL,
-	item_id int4 NOT NULL,
+	product_price numeric NULL,
+	product_tax numeric NULL,
+	product_id int4 NOT NULL,
 	unit_id int4 NOT NULL,
 	discount_id int4 NOT NULL,
-	item_loc varchar NULL,
+	product_loc varchar NULL,
 	update_ts timestamp NOT NULL DEFAULT now(),
-	CONSTRAINT item_details_pkey null,
-	CONSTRAINT item_details_discount_id_fkey FOREIGN KEY (discount_id) REFERENCES public.discount(id),
-	CONSTRAINT item_details_item_id_fkey FOREIGN KEY (item_id) REFERENCES public.item(id),
-	CONSTRAINT item_details_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES public.unit(id)
+	CONSTRAINT product_details_pkey PRIMARY KEY (id),
+	CONSTRAINT product_details_discount_id_fkey FOREIGN KEY (discount_id) REFERENCES discount(id),
+	CONSTRAINT product_details_product_id_fkey FOREIGN KEY (product_id) REFERENCES product(id),
+	CONSTRAINT product_details_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES unit(id)
 );
 
 
@@ -195,17 +203,16 @@ CREATE TABLE public.item_details (
 
 -- Drop table
 
--- DROP TABLE public.invoice_detail;
+-- DROP TABLE invoice_detail;
 
-CREATE TABLE public.invoice_detail (
+CREATE TABLE invoice_detail (
 	id int4 NOT NULL,
 	invoice_id int4 NOT NULL,
-	item_details_id int4 NOT NULL,
+	product_details_id int4 NOT NULL,
 	tax numeric NULL,
 	discount numeric NULL,
 	total_amount numeric NOT NULL,
-	quantity int4 NOT NULL DEFAULT 1,
-	CONSTRAINT invoice_detail_pkey null,
-	CONSTRAINT invoice_detail_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES public.invoice(id),
-	CONSTRAINT invoice_detail_item_details_id_fkey FOREIGN KEY (item_details_id) REFERENCES public.item_details(id)
+	CONSTRAINT invoice_detail_pkey PRIMARY KEY (id),
+	CONSTRAINT invoice_detail_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES invoice(id),
+	CONSTRAINT invoice_detail_product_details_id_fkey FOREIGN KEY (product_details_id) REFERENCES product_details(id)
 );

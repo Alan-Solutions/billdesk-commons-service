@@ -11,15 +11,6 @@ CREATE SEQUENCE public.category_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
--- DROP SEQUENCE public.customer_id_seq;
-
-CREATE SEQUENCE public.customer_id_seq
-	INCREMENT BY 1
-	MINVALUE 1
-	MAXVALUE 9223372036854775807
-	START 1
-	CACHE 1
-	NO CYCLE;
 -- DROP SEQUENCE public.discount_seq;
 
 CREATE SEQUENCE public.discount_seq
@@ -29,30 +20,12 @@ CREATE SEQUENCE public.discount_seq
 	START 1
 	CACHE 1
 	NO CYCLE;
--- DROP SEQUENCE public.invoice_detail_id_seq;
+-- DROP SEQUENCE public.product_details_seq;
 
-CREATE SEQUENCE public.invoice_detail_id_seq
+CREATE SEQUENCE public.product_details_seq
 	INCREMENT BY 1
 	MINVALUE 1
 	MAXVALUE 9223372036854775807
-	START 1
-	CACHE 1
-	NO CYCLE;
--- DROP SEQUENCE public.invoice_id_seq;
-
-CREATE SEQUENCE public.invoice_id_seq
-	INCREMENT BY 1
-	MINVALUE 1
-	MAXVALUE 9223372036854775807
-	START 1
-	CACHE 1
-	NO CYCLE;
--- DROP SEQUENCE public.product_details_id_seq;
-
-CREATE SEQUENCE public.product_details_id_seq
-	INCREMENT BY 1
-	MINVALUE 1
-	MAXVALUE 2147483647
 	START 1
 	CACHE 1
 	NO CYCLE;
@@ -82,25 +55,17 @@ CREATE SEQUENCE public.users_id_seq
 	MAXVALUE 9223372036854775807
 	START 1
 	CACHE 1
-	NO CYCLE;
--- DROP SEQUENCE public.users_id_seq1;
-
-CREATE SEQUENCE public.users_id_seq1
-	INCREMENT BY 1
-	MINVALUE 1
-	MAXVALUE 9223372036854775807
-	START 1
-	CACHE 1
 	NO CYCLE;-- public.category definition
 
 -- Drop table
 
--- DROP TABLE public.category;
+-- DROP TABLE category;
 
-CREATE TABLE public.category (
+CREATE TABLE category (
 	id int4 NOT NULL,
-	"name" varchar(255) NULL,
-	CONSTRAINT category_pkey PRIMARY KEY (id)
+	"name" varchar NOT NULL,
+	CONSTRAINT category_pkey PRIMARY KEY (id),
+	CONSTRAINT cgy_name_unq UNIQUE (name)
 );
 
 
@@ -108,50 +73,34 @@ CREATE TABLE public.category (
 
 -- Drop table
 
--- DROP TABLE public.customer;
+-- DROP TABLE customer;
 
-CREATE TABLE public.customer (
-	dob date NULL,
-	id bigserial NOT NULL,
-	address varchar(255) NULL,
-	create_ts varchar(255) NULL,
-	"name" varchar(255) NULL,
+CREATE TABLE customer (
+	id int4 NOT NULL,
+	"name" varchar NULL,
 	phone _varchar NULL,
+	dob date NULL,
+	create_ts varchar NULL,
+	address varchar NULL,
 	CONSTRAINT customer_pkey PRIMARY KEY (id)
 );
+CREATE INDEX cust_phone_idx ON public.customer USING gin (phone);
 
 
 -- public.discount definition
 
 -- Drop table
 
--- DROP TABLE public.discount;
+-- DROP TABLE discount;
 
-CREATE TABLE public.discount (
-	discount float8 NULL,
+CREATE TABLE discount (
 	id int4 NOT NULL,
-	discount_expiry timestamp(6) NULL,
-	discount_name varchar(255) NULL,
-	discount_type varchar(255) NULL,
-	status varchar(255) NULL,
+	discount_name varchar NULL,
+	discount numeric NULL,
+	discount_type varchar NOT NULL DEFAULT 'relative'::character varying,
+	discount_expiry timestamp NOT NULL DEFAULT to_timestamp('1970-01-01 00:00:00'::text, 'yyyy-MM-dd hh24:mi:ss'::text),
+	status varchar NOT NULL DEFAULT 'active'::character varying,
 	CONSTRAINT discount_pkey PRIMARY KEY (id)
-);
-
-
--- public.invoice_detail definition
-
--- Drop table
-
--- DROP TABLE public.invoice_detail;
-
-CREATE TABLE public.invoice_detail (
-	discount float4 NULL,
-	tax float4 NULL,
-	total_amount float8 NULL,
-	id bigserial NOT NULL,
-	invoice_id int8 NULL,
-	product_details_id varchar(255) NULL,
-	CONSTRAINT invoice_detail_pkey PRIMARY KEY (id)
 );
 
 
@@ -159,9 +108,9 @@ CREATE TABLE public.invoice_detail (
 
 -- Drop table
 
--- DROP TABLE public.props;
+-- DROP TABLE props;
 
-CREATE TABLE public.props (
+CREATE TABLE props (
 	"key" varchar NULL,
 	value varchar NULL
 );
@@ -171,12 +120,12 @@ CREATE TABLE public.props (
 
 -- Drop table
 
--- DROP TABLE public.unit;
+-- DROP TABLE unit;
 
-CREATE TABLE public.unit (
+CREATE TABLE unit (
 	id int4 NOT NULL,
-	unit_size float8 NULL,
-	unit_description varchar(255) NULL,
+	unit_description varchar NULL,
+	unit_size numeric NULL,
 	CONSTRAINT unit_pkey PRIMARY KEY (id)
 );
 
@@ -185,9 +134,9 @@ CREATE TABLE public.unit (
 
 -- Drop table
 
--- DROP TABLE public.users;
+-- DROP TABLE users;
 
-CREATE TABLE public.users (
+CREATE TABLE users (
 	created_ts timestamp(6) NOT NULL,
 	id bigserial NOT NULL,
 	first_name varchar(255) NOT NULL,
@@ -204,20 +153,17 @@ CREATE TABLE public.users (
 
 -- Drop table
 
--- DROP TABLE public.invoice;
+-- DROP TABLE invoice;
 
-CREATE TABLE public.invoice (
-	quantity float4 NOT NULL,
-	create_ts timestamp(6) NULL,
-	customer_id int8 NULL,
-	id bigserial NOT NULL,
-	user_id int8 NULL,
-	"type" varchar(255) NULL,
-	CONSTRAINT invoice_customer_id_key UNIQUE (customer_id),
+CREATE TABLE invoice (
+	id int4 NOT NULL,
+	"type" varchar NULL DEFAULT 'invoice'::character varying,
+	create_ts timestamp NOT NULL DEFAULT now(),
+	customer_id int4 NULL,
+	user_id int4 NOT NULL,
 	CONSTRAINT invoice_pkey PRIMARY KEY (id),
-	CONSTRAINT invoice_user_id_key UNIQUE (user_id),
-	CONSTRAINT fk5e32ukwo9uknwhylogvta4po6 FOREIGN KEY (customer_id) REFERENCES public.customer(id),
-	CONSTRAINT fkc8jotskr93810vgn75qlbusw2 FOREIGN KEY (user_id) REFERENCES public.users(id)
+	CONSTRAINT invoice_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customer(id),
+	CONSTRAINT invoice_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 
@@ -225,16 +171,17 @@ CREATE TABLE public.invoice (
 
 -- Drop table
 
--- DROP TABLE public.product;
+-- DROP TABLE product;
 
-CREATE TABLE public.product (
-	category_id int4 NULL,
+CREATE TABLE product (
 	id int4 NOT NULL,
-	create_ts timestamp(6) NULL,
-	"name" varchar(255) NULL,
-	product_invoice_name varchar(255) NULL,
+	"name" varchar NULL,
+	product_invoice_name varchar NULL,
+	category_id int4 NULL,
+	create_ts timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	CONSTRAINT product_name_ctg_idunq UNIQUE (name, category_id),
 	CONSTRAINT product_pkey PRIMARY KEY (id),
-	CONSTRAINT fk1mtsbur82frn64de7balymq9s FOREIGN KEY (category_id) REFERENCES public.category(id)
+	CONSTRAINT product_category_id_fkey FOREIGN KEY (category_id) REFERENCES category(id)
 );
 
 
@@ -242,19 +189,38 @@ CREATE TABLE public.product (
 
 -- Drop table
 
--- DROP TABLE public.product_details;
+-- DROP TABLE product_details;
 
-CREATE TABLE public.product_details (
-	discount_id int4 NULL,
-	id serial4 NOT NULL,
-	product_id int4 NULL,
-	product_price float4 NULL,
-	product_tax float4 NULL,
-	unit_id int4 NULL,
-	update_ts timestamp(6) NULL,
-	product_loc varchar(255) NULL,
+CREATE TABLE product_details (
+	id int4 NOT NULL,
+	product_price numeric NULL,
+	product_tax numeric NULL,
+	product_id int4 NOT NULL,
+	unit_id int4 NOT NULL,
+	discount_id int4 NOT NULL,
+	product_loc varchar NULL,
+	update_ts timestamp NOT NULL DEFAULT now(),
 	CONSTRAINT product_details_pkey PRIMARY KEY (id),
-	CONSTRAINT fkeiohp4spahrikingreddm7n8d FOREIGN KEY (unit_id) REFERENCES public.unit(id),
-	CONSTRAINT fkndgg1ab1volapr3o9ger2hb7g FOREIGN KEY (discount_id) REFERENCES public.discount(id),
-	CONSTRAINT fkrhahp4f26x99lqf0kybcs79rb FOREIGN KEY (product_id) REFERENCES public.product(id)
+	CONSTRAINT product_details_discount_id_fkey FOREIGN KEY (discount_id) REFERENCES discount(id),
+	CONSTRAINT product_details_product_id_fkey FOREIGN KEY (product_id) REFERENCES product(id),
+	CONSTRAINT product_details_unit_id_fkey FOREIGN KEY (unit_id) REFERENCES unit(id)
+);
+
+
+-- public.invoice_detail definition
+
+-- Drop table
+
+-- DROP TABLE invoice_detail;
+
+CREATE TABLE invoice_detail (
+	id int4 NOT NULL,
+	invoice_id int4 NOT NULL,
+	product_details_id int4 NOT NULL,
+	tax numeric NULL,
+	discount numeric NULL,
+	total_amount numeric NOT NULL,
+	CONSTRAINT invoice_detail_pkey PRIMARY KEY (id),
+	CONSTRAINT invoice_detail_invoice_id_fkey FOREIGN KEY (invoice_id) REFERENCES invoice(id),
+	CONSTRAINT invoice_detail_product_details_id_fkey FOREIGN KEY (product_details_id) REFERENCES product_details(id)
 );

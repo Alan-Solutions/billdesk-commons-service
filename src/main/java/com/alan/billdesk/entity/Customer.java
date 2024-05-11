@@ -3,7 +3,7 @@ package com.alan.billdesk.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -23,7 +23,7 @@ public class Customer {
     private List<String> phone;
 
     @Column(name = "dob")
-    private Date dob;
+    private Timestamp dob;
 
     @Column(name = "create_ts")
     private String createTs;

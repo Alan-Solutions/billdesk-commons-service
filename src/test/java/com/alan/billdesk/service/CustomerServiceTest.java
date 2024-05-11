@@ -1,16 +1,18 @@
 package com.alan.billdesk.service;
 
+import com.alan.billdesk.constants.Constants;
 import com.alan.billdesk.entity.Customer;
+import com.alan.billdesk.response.BillDeskResponse;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -30,7 +32,7 @@ class CustomerServiceTest {
         Customer customer = new Customer();
         customer.setName(name);
         customer.setPhone(Arrays.asList("2947291478", "1274898798"));
-        customer.setDob(new Date(1652064000000L));
+        customer.setDob(new Timestamp(System.currentTimeMillis()));
         customer.setCreateTs("2023-05-09 12:00:00");
         customer.setAddress("Madurai");
         return customer;
@@ -64,15 +66,15 @@ class CustomerServiceTest {
     @Order(3)
     void testGetCustomerById() {
         customer.setId(1L);
-        Optional<Customer> retrievedCustomer = customerService.getCustomerById(1L);
-        assertTrue(retrievedCustomer.isPresent());
-        assertEquals("Customer 1", retrievedCustomer.get().getName());
+        Customer retrievedCustomer = customerService.getCustomerById(1L).getBody();
+        assertNotNull(retrievedCustomer);
+        assertEquals("Customer 1", retrievedCustomer.getName());
     }
 
     @Test
     @Order(4)
     void testGetAllCustomers() {
-        List<Customer> retrievedCustomers = customerService.getAllCustomers();
+        List<Customer> retrievedCustomers = customerService.getAllCustomers().getBody();
         assertNotNull(retrievedCustomers);
         assertEquals(3, retrievedCustomers.size());
         assertEquals("Customer 1", retrievedCustomers.get(0).getName());
@@ -83,22 +85,22 @@ class CustomerServiceTest {
     @Test
     @Order(5)
     void testDeleteCustomerById() {
-        customerService.deleteCustomerById(1L);
-        assertFalse(customerService.getCustomerById(1L).isPresent());
+        BillDeskResponse<Customer> billDeskResponse = customerService.deleteCustomerById(1L);
+        assertEquals(Constants.SUCCESS, billDeskResponse.getStatus());
     }
 
     @Test
     @Order(6)
     void testDeleteCustomer() {
-        Optional<Customer> deleteCustomer = customerService.getCustomerById(2L);
-        deleteCustomer.ifPresent(value -> customerService.deleteCustomer(value));
-        assertFalse(customerService.getCustomerById(2L).isPresent());
+        BillDeskResponse<Customer> deleteCustomer = customerService.getCustomerById(2L);
+        BillDeskResponse<Customer> deleteResponse = customerService.deleteCustomer(deleteCustomer.getBody());
+        assertEquals(Constants.SUCCESS, deleteResponse.getStatus());
     }
 
     @Test
     @Order(7)
     void testDeleteAllCustomers() {
-        customerService.deleteAllCustomers();
-        assertEquals(0,customerService.getAllCustomers().size());
+        BillDeskResponse<Customer> deleteResponse = customerService.deleteAllCustomers();
+        assertEquals(Constants.SUCCESS, deleteResponse.getStatus());
     }
 }

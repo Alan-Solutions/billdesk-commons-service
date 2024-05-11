@@ -46,7 +46,7 @@ public class CustomerService {
     public BillDeskResponse<Customer> updateCustomer(Customer customer) {
         Customer customerResponse = null;
         try {
-            if (getCustomerById(customer.getId()).isPresent()) {
+            if (customerRepository.findById(customer.getId()).isPresent()) {
                 customerResponse = customerRepository.save(customer);
             }
         } catch (DataAccessException dae) {
@@ -59,32 +59,86 @@ public class CustomerService {
         return commonUtils.createResponse(customerResponse, dataNotAvailableJson());
     }
 
-    public Optional<Customer> getCustomerById(Long id) {
+    public BillDeskResponse<Customer> getCustomerById(Long id) {
+        Customer customer = null;
         try {
-            return customerRepository.findById(id);
+            Optional<Customer> customerResponse = customerRepository.findById(id);
+            if (customerResponse.isPresent()) {
+                customer = customerResponse.get();
+            }
         } catch (DataAccessException dae) {
-            logger.error("Error while making call to CustomerService.updateCustomer() ", dae);
+            logger.error("Error while making call to CustomerService.getCustomerById() ", dae);
             throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
         } catch (Exception e) {
-            logger.error("Error while making call to CustomerService.updateCustomer() :: Exception", e);
+            logger.error("Error while making call to CustomerService.getCustomerById() :: Exception", e);
+            throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
+        }
+        return commonUtils.createResponse(customer, dataNotAvailableJson());
+    }
+
+    public BillDeskResponse<List<Customer>> getAllCustomers() {
+        List<Customer> allCustomers = null;
+        try {
+            allCustomers = customerRepository.findAll(Sort.by("id").ascending());
+            if (allCustomers.isEmpty()) {
+                return new BillDeskResponse<List<Customer>>(Constants.FAILED, null, dataNotAvailableJson());
+            } else {
+                return new BillDeskResponse<List<Customer>>(Constants.SUCCESS, allCustomers, commonUtils.emptyJson());
+            }
+        } catch (DataAccessException dae) {
+            logger.error("Error while making call to CustomerService.getAllCustomers() ", dae);
+            throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+        } catch (Exception e) {
+            logger.error("Error while making call to CustomerService.getAllCustomers() :: Exception", e);
             throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
         }
     }
 
-    public List<Customer> getAllCustomers() {
-        return customerRepository.findAll(Sort.by("id").ascending());
+    public BillDeskResponse<Customer> deleteCustomerById(Long id) {
+        try {
+            if (customerRepository.findById(id).isPresent()) {
+                customerRepository.deleteById(id);
+                return new BillDeskResponse<>(Constants.SUCCESS, null, commonUtils.emptyJson());
+            } else {
+                return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
+            }
+        } catch (DataAccessException dae) {
+            logger.error("Error while making call to CustomerService.deleteCustomerById() ", dae);
+            throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+        } catch (Exception e) {
+            logger.error("Error while making call to CustomerService.deleteCustomerById() :: Exception", e);
+            throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
+        }
     }
 
-    public void deleteCustomerById(Long id) {
-        customerRepository.deleteById(id);
+    public BillDeskResponse<Customer> deleteCustomer(Customer customer) {
+        try {
+            if (customerRepository.findById(customer.getId()).isPresent()) {
+                customerRepository.delete(customer);
+                return new BillDeskResponse<>(Constants.SUCCESS, null, commonUtils.emptyJson());
+            } else {
+                return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
+            }
+        } catch (DataAccessException dae) {
+            logger.error("Error while making call to CustomerService.deleteCustomer() ", dae);
+            throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+        } catch (Exception e) {
+            logger.error("Error while making call to CustomerService.deleteCustomer() :: Exception", e);
+            throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
+        }
     }
 
-    public void deleteCustomer(Customer customer) {
-        customerRepository.delete(customer);
-    }
-
-    public void deleteAllCustomers() {
-        customerRepository.deleteAll();
+    public BillDeskResponse<Customer> deleteAllCustomers() {
+        try {
+            customerRepository.deleteAll();
+            return new BillDeskResponse<>(Constants.SUCCESS, null, commonUtils.emptyJson());
+        } catch (DataAccessException dae) {
+            logger.error("Error while making call to CustomerService.deleteAllCustomers() ", dae);
+            throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+        } catch (Exception e) {
+            logger.error("Error while making call to CustomerService.deleteAllCustomers() :: Exception", e);
+            throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
+        }
     }
 
     private JSONObject dataNotAvailableJson() {

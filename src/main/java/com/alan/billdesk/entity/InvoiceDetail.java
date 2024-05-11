@@ -19,8 +19,8 @@ public class InvoiceDetail {
   @Column(name = "invoice_id")
   private long invoiceId;
 
-  @Column(name = "item_details_id")
-  private String itemDetailsId;
+  @Column(name = "product_details_id")
+  private String productDetailsId;
 
   @Column(name = "tax")
   private float tax;

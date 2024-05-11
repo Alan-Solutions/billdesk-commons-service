@@ -69,12 +69,11 @@
             <version>${alan.user.version}</version>
         </dependency>
 
-            <dependency>
-                <groupId>com.googlecode.json-simple</groupId>
-                <artifactId>json-simple</artifactId>
-                <version>${simple.json.version}</version>
-            </dependency>
-
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>${simple.json.version}</version>
+        </dependency>
 
     </dependencies>
 

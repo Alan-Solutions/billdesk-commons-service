@@ -59,8 +59,11 @@ public class UnitServiceTest {
     unit.setDescription("Single Unit / Normal Unit");
     unit.setSize(1d);
     Unit updatedUnit = unitService.update(unit).getBody();
+    assertTrue(null != updatedUnit);
+    updatedUnit = unitService.findUnitById(unit.getId()).getBody();
+
     assertTrue(updatedUnit.getDescription().equals(unit.getDescription()));
-    assertTrue(updatedUnit.getSize() == unit.getSize());
+    assertTrue(commonUtils.equals(unit.getSize(), updatedUnit.getSize()));
   }
 
   @Test

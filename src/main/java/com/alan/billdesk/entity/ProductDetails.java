@@ -14,22 +14,22 @@ import java.util.Date;
 
 @Data
 @Entity
-@Table(name = "item_details")
-public class ItemDetails {
+@Table(name = "product_details")
+public class ProductDetails {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
 
-  @Column(name = "item_price")
+  @Column(name = "product_price")
   private float price;
 
-  @Column(name = "item_tax")
+  @Column(name = "product_tax")
   private float tax;
 
   @ManyToOne
-  @JoinColumn(name = "item_id")
-  private Item item;
+  @JoinColumn(name = "product_id")
+  private Product item;
 
   @ManyToOne
   @JoinColumn(name = "unit_id")
@@ -39,7 +39,7 @@ public class ItemDetails {
   @JoinColumn(name = "discount_id")
   private Discount discount;
 
-  @Column(name = "item_loc")
+  @Column(name = "product_loc")
   private String item_loc;
 
   @Column(name = "update_ts")

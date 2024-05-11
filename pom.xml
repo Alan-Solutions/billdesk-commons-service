@@ -21,7 +21,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <postgresql.version>42.7.3</postgresql.version>
         <junit.jupiter.version>5.9.1</junit.jupiter.version>
-        <alan.user.version>1.0-SNAPSHOT</alan.user.version>
+        <alan.user.version>1.0.1</alan.user.version>
         <simple.json.version>1.1.1</simple.json.version>
     </properties>
 
@@ -69,12 +69,11 @@
             <version>${alan.user.version}</version>
         </dependency>
 
-            <dependency>
-                <groupId>com.googlecode.json-simple</groupId>
-                <artifactId>json-simple</artifactId>
-                <version>${simple.json.version}</version>
-            </dependency>
-
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>${simple.json.version}</version>
+        </dependency>
 
     </dependencies>
 

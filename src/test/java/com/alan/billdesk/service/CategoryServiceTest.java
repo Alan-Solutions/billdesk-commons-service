@@ -72,6 +72,8 @@ public class CategoryServiceTest {
         category.setId(defaultCategory.getId());
         category.setName("New Recharge");
         Category updatedCategory = categoryService.update(category).getBody();
+        assertTrue(null != updatedCategory);
+        updatedCategory = categoryService.findCategoryById(category.getId()).getBody();
         assertTrue(updatedCategory.getName().equals(category.getName()));
     }
 
@@ -87,7 +89,7 @@ public class CategoryServiceTest {
 //    @Order(6)
 //    public void deleteAllTest() {
 //        categoryService.deleteAll();
-//        List<Category> categories = categoryService.findAllByOrderByIdAsc();
+//        List<Category> categories = categoryService.findAllByOrderByIdAsc().getBody();
 //        assertTrue(categories.isEmpty());
 //    }
 

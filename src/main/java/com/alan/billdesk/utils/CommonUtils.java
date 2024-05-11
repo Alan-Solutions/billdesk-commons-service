@@ -35,7 +35,7 @@ public class CommonUtils {
   public boolean equals(Double d1, Double d2) {
     if (null == d1 || null == d2)
       return true;
-    return d1 == d2;
+    return d1.equals(d2);
   }
 
   public boolean equals(LocalDateTime d1, LocalDateTime d2) {
@@ -65,6 +65,16 @@ public class CommonUtils {
   public <T> BillDeskResponse<T> createResponse(T t, JSONObject errorJson) {
     BillDeskResponse<T> response = new BillDeskResponse<>(Constants.SUCCESS, t, emptyJson());
     if (null != t) {
+      return response;
+    }
+    response.setStatus(Constants.FAILED);
+    response.setErrorDetails(errorJson);
+    return response;
+  }
+
+  public <T> BillDeskResponse<List<T>> createResponse(List<T> t, JSONObject errorJson) {
+    BillDeskResponse<List<T>> response = new BillDeskResponse<>(Constants.SUCCESS, t, emptyJson());
+    if (null != t && !t.isEmpty()) {
       return response;
     }
     response.setStatus(Constants.FAILED);

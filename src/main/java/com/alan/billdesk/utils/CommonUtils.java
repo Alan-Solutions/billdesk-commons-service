@@ -1,6 +1,7 @@
 package com.alan.billdesk.utils;
 
 import com.alan.billdesk.constants.Constants;
+import com.alan.billdesk.constants.DataStatusEnum;
 import com.alan.billdesk.response.BillDeskResponse;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Component;
@@ -91,6 +92,10 @@ public class CommonUtils {
     response.setStatus(Constants.FAILED);
     response.setErrorDetails(errorJson);
     return response;
+  }
+
+  public JSONObject dataNotAvailableJson() {
+    return createErrorJson(DataStatusEnum.DATA_NOT_AVAILABLE.getCode(), DataStatusEnum.DATA_NOT_AVAILABLE.getMessage(), Constants.FALSE);
   }
 
 }

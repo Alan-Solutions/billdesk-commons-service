@@ -30,13 +30,13 @@ public class ProductService {
 
   public BillDeskResponse<List<Product>> findAllByOrderByIdAsc() {
     try {
-      List<Product> items = productRepository.findAllByOrderByIdAsc();
-      return commonUtils.createResponse(items, dataNotAvailableJson());
+      List<Product> products = productRepository.findAllByOrderByIdAsc();
+      return commonUtils.createResponse(products, dataNotAvailableJson());
     } catch (DataAccessException dae) {
-      logger.error("Error while making call to ItemService.findAllByOrderByIdAsc() ", dae);
+      logger.error("Error while making call to ProductService.findAllByOrderByIdAsc() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to ItemService.findAllByOrderByIdAsc() :: Exception", e);
+      logger.error("Error while making call to ProductService.findAllByOrderByIdAsc() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
   }
@@ -46,10 +46,10 @@ public class ProductService {
       product = save(product);
       return commonUtils.createResponse(product, dataNotAvailableJson());
     } catch (DataAccessException dae) {
-      logger.error("Error while making call to ItemService.saveItem() ", dae);
+      logger.error("Error while making call to ProductService.saveItem() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to ItemService.findAllBsaveItemyOrderByIdAsc() :: Exception", e);
+      logger.error("Error while making call to ProductService.findAllBsaveItemyOrderByIdAsc() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
   }
@@ -58,10 +58,10 @@ public class ProductService {
     try {
       return commonUtils.createResponse(findById(id), dataNotAvailableJson());
     } catch (DataAccessException dae) {
-      logger.error("Error while making call to ItemService.findProductById() ", dae);
+      logger.error("Error while making call to ProductService.findProductById() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to ItemService.findProductById() :: Exception", e);
+      logger.error("Error while making call to ProductService.findProductById() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
   }
@@ -70,10 +70,10 @@ public class ProductService {
     try {
       return commonUtils.createResponse(findByName(productName), dataNotAvailableJson());
     } catch (DataAccessException dae) {
-      logger.error("Error while making call to ItemService.findProductById() ", dae);
+      logger.error("Error while making call to ProductService.findProductById() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to ItemService.findProductById() :: Exception", e);
+      logger.error("Error while making call to ProductService.findProductById() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
   }
@@ -87,10 +87,10 @@ public class ProductService {
         product = save(pEntity);
       }
     } catch (DataAccessException dae) {
-      logger.error("Error while making call to ItemService.update() ", dae);
+      logger.error("Error while making call to ProductService.update() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to ItemService.update() :: Exception", e);
+      logger.error("Error while making call to ProductService.update() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
     return commonUtils.createResponse(product, dataNotAvailableJson());
@@ -101,10 +101,10 @@ public class ProductService {
     try {
       productRepository.deleteById(id);
     } catch (DataAccessException dae) {
-      logger.error("Error while making call to ItemService.deleteById() ", dae);
+      logger.error("Error while making call to ProductService.deleteById() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to ItemService.deleteById() :: Exception", e);
+      logger.error("Error while making call to ProductService.deleteById() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
   }
@@ -113,10 +113,10 @@ public class ProductService {
     try {
       productRepository.deleteAll();
     } catch (DataAccessException dae) {
-      logger.error("Error while making call to ItemService.deleteAll() ", dae);
+      logger.error("Error while making call to ProductService.deleteAll() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
     } catch (Exception e) {
-      logger.error("Error while making call to ItemService.deleteAll() :: Exception", e);
+      logger.error("Error while making call to ProductService.deleteAll() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
   }

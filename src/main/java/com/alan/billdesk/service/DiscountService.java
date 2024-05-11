@@ -29,14 +29,10 @@ public class DiscountService {
   private CommonUtils commonUtils;
 
   public BillDeskResponse<List<Discount>> findAllByOrderByIdAsc() {
-    List<Discount> discounts = null;
+
     try {
-      discounts = discountRepository.findAllByOrderByIdAsc();
-      if (null != discounts) {
-        return new BillDeskResponse<>(Constants.SUCCESS, discounts, commonUtils.emptyJson());
-      } else {
-        return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
-      }
+      List<Discount> discounts = discountRepository.findAllByOrderByIdAsc();
+      return commonUtils.createResponse(discounts, dataNotAvailableJson());
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.findAllByOrderByIdAsc() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -48,11 +44,7 @@ public class DiscountService {
 
   public BillDeskResponse<Discount> findDiscountById(int id) {
     try {
-      Optional<Discount> discountOptional = findById(id);
-      if (discountOptional.isPresent()) {
-        return new BillDeskResponse<>(Constants.SUCCESS, discountOptional.get(), commonUtils.emptyJson());
-      }
-      return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
+      return commonUtils.createResponse(findById(id), dataNotAvailableJson());
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.findById() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -66,10 +58,7 @@ public class DiscountService {
     List<Discount> discounts = null;
     try {
       discounts = discountRepository.findByDiscountName(name.toUpperCase());
-      if (!commonUtils.isNullOrEmpty(discounts)) {
-        return new BillDeskResponse<>(Constants.SUCCESS, discounts, commonUtils.emptyJson());
-      }
-      return new BillDeskResponse<>(Constants.FAILED, discounts, dataNotAvailableJson());
+      return commonUtils.createResponse(discounts, dataNotAvailableJson());
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.findByDiscountName() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -82,8 +71,7 @@ public class DiscountService {
   public BillDeskResponse<Discount> saveDiscount(Discount discount) {
     try {
       discount.setDiscountName(discount.getDiscountName().toUpperCase());
-      discount = save(discount);
-      return new BillDeskResponse<>(Constants.SUCCESS, discount, commonUtils.emptyJson());
+      return commonUtils.createResponse(save(discount), dataNotAvailableJson());
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.save() ", dae);
       throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
@@ -103,7 +91,6 @@ public class DiscountService {
         update(existingDiscount, discountEntity);
         existingDiscount = save(discountEntity);
         logger.debug("Updated discount  :: {}", existingDiscount);
-        return new BillDeskResponse<>(Constants.SUCCESS, existingDiscount, commonUtils.emptyJson());
       }
     } catch (DataAccessException dae) {
       logger.error("Error while making call to DiscountService.update() ", dae);
@@ -112,7 +99,7 @@ public class DiscountService {
       logger.error("Error while making call to DiscountService.update() :: Exception", e);
       throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
     }
-    return new BillDeskResponse<>(Constants.FAILED, null, dataNotAvailableJson());
+    return commonUtils.createResponse(existingDiscount, dataNotAvailableJson());
   }
 
   public void deleteById(int id) {

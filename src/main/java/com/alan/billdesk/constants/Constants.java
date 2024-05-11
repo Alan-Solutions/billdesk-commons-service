@@ -14,5 +14,8 @@ public class Constants {
   public static final String ACTIVE = "active";
   public static final String IN_ACTIVE = "inactive";
 
+  public static final String RELATIVE = "relative";
+  public static final String FIXED = "fixed";
+
 
 }

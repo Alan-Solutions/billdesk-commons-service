@@ -90,7 +90,7 @@ public class DiscountServiceTest {
     dEntity = discountService.update(fromUi).getBody();
     dEntity = discountService.findDiscountById(dEntity.getId()).getBody();
 
-    System.out.println("ui - "+fromUi.getDiscount() +" - dE = "+dEntity.getDiscount());
+//    System.out.println("ui - "+fromUi.getDiscount() +" - dE = "+dEntity.getDiscount());
 
     assertTrue(commonUtils.equals(fromUi.getDiscount(), dEntity.getDiscount()));
     assertTrue(commonUtils.equals(fromUi.getDiscountName().toUpperCase(), dEntity.getDiscountName()));

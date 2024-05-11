@@ -2,12 +2,14 @@ package com.alan.billdesk.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "product")
 @Data
+@DynamicInsert
 public class Product {
 
     @Id

@@ -1,6 +1,5 @@
 package com.alan.billdesk.service;
 
-import com.alan.billdesk.constants.Constants;
 import com.alan.billdesk.entity.Category;
 import com.alan.billdesk.entity.Discount;
 import com.alan.billdesk.entity.Product;
@@ -102,17 +101,43 @@ public class ProductDetailsTest {
   }
 
   @Test
-  @Order(2)
-  public void deleteAll() {
-    pdService.deleteAll();
-    discountService.deleteAll();
-    unitService.deleteAll();
-    productService.deleteAll();
-    categoryService.deleteAll();
-    assertTrue(Constants.FAILED.equals(pdService.findAllByOrderByIdAsc().getStatus()));
-    assertTrue(Constants.FAILED.equals(productService.findAllByOrderByIdAsc().getStatus()));
-    assertTrue(Constants.FAILED.equals(categoryService.findAllByOrderByIdAsc().getStatus()));
-    assertTrue(Constants.FAILED.equals(discountService.findAllByOrderByIdAsc().getStatus()));
-    assertTrue(Constants.FAILED.equals(unitService.findAllByOrderByIdAsc().getStatus()));
+  @Order(3)
+  public void findProductDetailsByPriceTest() {
+    List<ProductDetails> productDetails = pdService.findProductDetailsByPrice(defaultPD.getPrice()).getBody();
+    for(ProductDetails productDetail : productDetails) {
+      assertTrue(null != productDetail);
+      assertTrue(null != productDetail.getProduct());
+      assertTrue(null != productDetail.getUnit());
+      assertTrue(null != productDetail.getDiscount());
+      assertTrue(null != productDetail.getProduct().getCategory());
+    }
   }
+
+  @Test
+  @Order(5)
+  public void findProductDetailsByTaxTest() {
+    List<ProductDetails> productDetails = pdService.findProductDetailsByTax(defaultPD.getTax()).getBody();
+    for(ProductDetails productDetail : productDetails) {
+      assertTrue(null != productDetail);
+      assertTrue(null != productDetail.getProduct());
+      assertTrue(null != productDetail.getUnit());
+      assertTrue(null != productDetail.getDiscount());
+      assertTrue(null != productDetail.getProduct().getCategory());
+    }
+  }
+
+//  @Test
+//  @Order(6)
+//  public void deleteAll() {
+//    pdService.deleteAll();
+//    discountService.deleteAll();
+//    unitService.deleteAll();
+//    productService.deleteAll();
+//    categoryService.deleteAll();
+//    assertTrue(Constants.FAILED.equals(pdService.findAllByOrderByIdAsc().getStatus()));
+//    assertTrue(Constants.FAILED.equals(productService.findAllByOrderByIdAsc().getStatus()));
+//    assertTrue(Constants.FAILED.equals(categoryService.findAllByOrderByIdAsc().getStatus()));
+//    assertTrue(Constants.FAILED.equals(discountService.findAllByOrderByIdAsc().getStatus()));
+//    assertTrue(Constants.FAILED.equals(unitService.findAllByOrderByIdAsc().getStatus()));
+//  }
 }

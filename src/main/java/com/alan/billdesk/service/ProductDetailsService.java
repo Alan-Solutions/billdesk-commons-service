@@ -53,6 +53,18 @@ public class ProductDetailsService {
     }
   }
 
+  public BillDeskResponse<List<ProductDetails>> findProductDetailsByPrice(double price) {
+    try {
+      return commonUtils.createResponse(findByPrice(price), dataNotAvailableJson());
+    } catch (DataAccessException dae) {
+      logger.error("Error while making call to ProductDetailsService.findProductDetailsByPrice() ", dae);
+      throw new BillDeskException(dae, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.DATABASE_ERROR_MESSAGE);
+    } catch (Exception e) {
+      logger.error("Error while making call to ProductDetailsService.findProductDetailsByPrice() :: Exception", e);
+      throw new BillDeskException(e, StatusCode.INTERNAL_SERVER_ERROR.value(), ErrorConstants.GENERIC_ERROR);
+    }
+  }
+
   public BillDeskResponse<List<ProductDetails>> findProductDetailsByTax(double tax) {
     try {
       return commonUtils.createResponse(findByTax(tax), dataNotAvailableJson());

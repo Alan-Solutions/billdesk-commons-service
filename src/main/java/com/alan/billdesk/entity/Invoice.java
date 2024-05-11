@@ -1,17 +1,10 @@
 package com.alan.billdesk.entity;
 
 import com.alan.user.entity.Users;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 
-import java.util.Date;
+import java.sql.Timestamp;
 
 @Data
 @Entity
@@ -19,19 +12,26 @@ import java.util.Date;
 public class Invoice {
 
   @Id
+  @Column(name = "id")
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private long id;
-  private String type;
-  private float quantity;
-  @Column(name = "create_ts")
-  private Date createTs;
+  @SequenceGenerator(name = "invoice_gen", sequenceName = "invoice_seq", allocationSize = 1)
+  private Long id;
 
-  @OneToOne
-  @JoinColumn(name = "customer_id")
+  @Column(name = "quantity")
+  private Long quantity;
+
+  @Column(name = "create_ts", nullable = false, columnDefinition = "timestamp default current_timestamp")
+  private Timestamp createTs;
+
+  @Column(name = "type", nullable = true, columnDefinition = "varchar default 'invoice'")
+  private String type;
+
+  @ManyToOne
+  @JoinColumn(name = "customer_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "invoice_customer_id_fkey"))
   private Customer customer;
 
-  @OneToOne
-  @JoinColumn(name = "user_id")
-  private Users users;
+  @ManyToOne
+  @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "invoice_user_id_fkey"))
+  private Users user;
 
 }

@@ -54,10 +54,9 @@ CREATE SEQUENCE public.users_id_seq
 
 CREATE TABLE category (
 	id int4 NOT NULL,
-	"name" varchar NULL,
+	"name" varchar NOT NULL,
 	CONSTRAINT category_pkey PRIMARY KEY (id),
-	CONSTRAINT cgy_name_unq UNIQUE (name),
-	CONSTRAINT name_unq UNIQUE (name)
+	CONSTRAINT cgy_name_unq UNIQUE (name)
 );
 
 

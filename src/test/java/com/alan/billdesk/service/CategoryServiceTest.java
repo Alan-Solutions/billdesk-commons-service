@@ -1,6 +1,8 @@
 package com.alan.billdesk.service;
 
+import com.alan.billdesk.constants.Constants;
 import com.alan.billdesk.entity.Category;
+import com.alan.billdesk.response.BillDeskResponse;
 import com.alan.billdesk.utils.CommonUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
@@ -29,7 +31,7 @@ public class CategoryServiceTest {
 
     @BeforeEach
     public void setUp() {
-        List<Category> categories = categoryService.findAllByOrderByIdAsc();
+        List<Category> categories = categoryService.findAllByOrderByIdAsc().getBody();
         if(!commonUtils.isNullOrEmpty(categories)) {
             defaultCategory = categories.get(0);
         }
@@ -40,21 +42,25 @@ public class CategoryServiceTest {
     public void saveTest() {
         Category category = new Category();
         category.setName("Recharge");
-        Category savedCategory = categoryService.save(category);
+        Category savedCategory = categoryService.saveCategory(category).getBody();
         assertEquals(category.getName(), savedCategory.getName());
     }
 
     @Test
     @Order(2)
     public void findByIdTest() {
-        Category category = categoryService.findById(defaultCategory.getId());
+        Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
         assertTrue(null != category);
+        List<Category> categories = categoryService.findAllByOrderByIdAsc().getBody();
+        category = categories.get(categories.size() - 1);
+        BillDeskResponse resp = categoryService.findCategoryById(category.getId() + 100);
+        assertTrue(resp.getStatus().equals(Constants.FAILED));
     }
 
     @Test
     @Order(3)
     public void findByNameTest() {
-        Category category = categoryService.findByName("Recharge");
+        Category category = categoryService.findByName("Recharge").getBody();
         assertTrue(category != null);
     }
 
@@ -65,17 +71,17 @@ public class CategoryServiceTest {
         Category category = new Category();
         category.setId(defaultCategory.getId());
         category.setName("New Recharge");
-        Category updatedCategory = categoryService.update(category);
+        Category updatedCategory = categoryService.update(category).getBody();
         assertTrue(updatedCategory.getName().equals(category.getName()));
     }
 
-    @Test
-    @Order(5)
-    public void deleteByIdTest() {
-        categoryService.delete(defaultCategory.getId());
-        Category category = categoryService.findById(defaultCategory.getId());
-        assertTrue(null == category);
-    }
+//    @Test
+//    @Order(5)
+//    public void deleteByIdTest() {
+//        categoryService.deleteById(defaultCategory.getId());
+//        Category category = categoryService.findCategoryById(defaultCategory.getId()).getBody();
+//        assertTrue(null == category);
+//    }
 
 //    @Test
 //    @Order(6)

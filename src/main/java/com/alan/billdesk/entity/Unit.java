@@ -18,7 +18,7 @@ public class Unit {
   @SequenceGenerator(name = "unit_gen", sequenceName = "unit_seq", allocationSize = 1)
   private int id;
   @Column(name = "unit_size")
-  private double size;
+  private Double size;
   @Column(name = "unit_description")
   private String description;
 

@@ -28,7 +28,7 @@ public class UnitServiceTest {
 
   @BeforeEach
   public void setUp() {
-    List<Unit> units = unitService.findAllByOrderByIdAsc();
+    List<Unit> units = unitService.findAllByOrderByIdAsc().getBody();
     if (!commonUtils.isNullOrEmpty(units)) {
       defaultUnit = units.get(0);
     }
@@ -39,15 +39,15 @@ public class UnitServiceTest {
   public void saveTest() {
     Unit unit = new Unit();
     unit.setDescription("Single Unit");
-    unit.setSize(1);
-    Unit savedUnit = unitService.save(unit);
+    unit.setSize(1d);
+    Unit savedUnit = unitService.saveUnit(unit).getBody();
     assertTrue(unit.getId() == savedUnit.getId());
   }
 
   @Test
   @Order(2)
   public void findByIdTest() {
-    Unit unit = unitService.findById(defaultUnit.getId());
+    Unit unit = unitService.findUnitById(defaultUnit.getId()).getBody();
     assertTrue(null != unit);
   }
 
@@ -57,8 +57,8 @@ public class UnitServiceTest {
     Unit unit = new Unit();
     unit.setId(defaultUnit.getId());
     unit.setDescription("Single Unit / Normal Unit");
-    unit.setSize(1);
-    Unit updatedUnit = unitService.update(unit);
+    unit.setSize(1d);
+    Unit updatedUnit = unitService.update(unit).getBody();
     assertTrue(updatedUnit.getDescription().equals(unit.getDescription()));
     assertTrue(updatedUnit.getSize() == unit.getSize());
   }
@@ -67,7 +67,7 @@ public class UnitServiceTest {
   @Order(4)
   public void deleteByIdTest() {
     unitService.deleteById(defaultUnit.getId());
-    Unit unit = unitService.findById(defaultUnit.getId());
+    Unit unit = unitService.findUnitById(defaultUnit.getId()).getBody();
     assertTrue(null == unit);
   }
 
